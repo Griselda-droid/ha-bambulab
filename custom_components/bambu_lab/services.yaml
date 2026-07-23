@@ -397,3 +397,52 @@ select_pa_profile:
       example: "GFB99"
       selector:
         text:
+set_pa_profile:
+  name: Set PA Calibration Profile
+  description: >-
+    Creates a Pressure Advance calibration profile on the printer using the supplied K value.
+    This uses the same extrusion_cali_set command as SpoolEase.
+  fields:
+    device_id:
+      name: Bambu Printer
+      required: true
+      selector:
+        device:
+          integration: bambu_lab
+    filament_id:
+      name: Filament ID
+      description: Filament type ID used by the printer, for example GFB99.
+      required: true
+      example: GFB99
+      selector:
+        text:
+    k_value:
+      name: K Value
+      description: Pressure Advance K value to store on the printer.
+      required: true
+      example: 0.02
+      selector:
+        number:
+          min: 0
+          max: 2
+          step: 0.001
+          mode: box
+    name:
+      name: Profile Name
+      description: Optional display name for the calibration profile.
+      required: false
+      example: Home Assistant PA
+      selector:
+        text:
+    setting_id:
+      name: Setting ID
+      description: Optional Bambu setting ID associated with the filament.
+      required: false
+      selector:
+        text:
+    nozzle_id:
+      name: Nozzle ID
+      description: Optional printer nozzle ID, for example HS00-0.4.
+      required: false
+      selector:
+        text:

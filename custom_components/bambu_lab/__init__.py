@@ -415,6 +415,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         "stop_filament_drying": SupportsResponse.NONE,
         "get_pa_profiles": SupportsResponse.ONLY,
         "select_pa_profile": SupportsResponse.NONE,
+        "set_pa_profile": SupportsResponse.NONE,
     }
     for command in services:
         hass.services.async_register(

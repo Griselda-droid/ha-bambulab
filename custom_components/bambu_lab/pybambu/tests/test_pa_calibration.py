@@ -10,7 +10,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')
 
 from pybambu.models import AMSTray, ExternalSpool, Device, HomeFlag
 from pybambu.const import Features, Home_Flag_Values
-from pybambu.commands import EXTRUSION_CALI_GET_TEMPLATE, EXTRUSION_CALI_SEL_TEMPLATE
+from pybambu.commands import EXTRUSION_CALI_GET_TEMPLATE, EXTRUSION_CALI_SEL_TEMPLATE, EXTRUSION_CALI_SET_TEMPLATE
 
 
 class TestCaliIdxParsing(unittest.TestCase):
@@ -113,6 +113,13 @@ class TestCommandTemplates(unittest.TestCase):
         self.assertIn('nozzle_diameter', cmd['print'])
         self.assertIn('extruder_id', cmd['print'])
 
+    def test_extrusion_cali_set_template_structure(self):
+        cmd = copy.deepcopy(EXTRUSION_CALI_SET_TEMPLATE)
+        self.assertEqual(cmd["print"]["command"], "extrusion_cali_set")
+        self.assertEqual(len(cmd["print"]["filaments"]), 1)
+        filament = cmd["print"]["filaments"][0]
+        for key in ("filament_id", "k_value", "name", "nozzle_diameter", "nozzle_id", "setting_id"):
+            self.assertIn(key, filament)
     def test_extrusion_cali_sel_template_structure(self):
         cmd = copy.deepcopy(EXTRUSION_CALI_SEL_TEMPLATE)
         self.assertEqual(cmd['print']['command'], 'extrusion_cali_sel')

@@ -61,6 +61,7 @@ from .pybambu.commands import (
     DONE_LOAD_FILAMENT_TEMPLATE,
     EXTRUSION_CALI_GET_TEMPLATE,
     EXTRUSION_CALI_SEL_TEMPLATE,
+    EXTRUSION_CALI_SET_TEMPLATE,
 )
 
 class BambuDataUpdateCoordinator(DataUpdateCoordinator):
@@ -300,6 +301,8 @@ class BambuDataUpdateCoordinator(DataUpdateCoordinator):
                 result = await self._service_call_get_pa_profiles(data)
             case "select_pa_profile":
                 result = self._service_call_select_pa_profile(data)
+            case "set_pa_profile":
+                result = self._service_call_set_pa_profile(data)
             case _:
                 LOGGER.error(f"Unknown service call: {data}")
 
@@ -784,6 +787,39 @@ class BambuDataUpdateCoordinator(DataUpdateCoordinator):
             "profiles": profiles,
         }
 
+    def _service_call_set_pa_profile(self, data: dict):
+        if not self.get_model().supports_feature(Features.PA_CALIBRATION_PROFILES):
+            LOGGER.error("Printer does not support PA calibration profiles")
+            return False
+
+        k_value = data.get("k_value")
+        filament_id = data.get("filament_id")
+        if k_value is None or not filament_id:
+            LOGGER.error("set_pa_profile requires k_value and filament_id")
+            return False
+        try:
+            k_value = f"{float(k_value):.6f}"
+        except (TypeError, ValueError):
+            LOGGER.error("set_pa_profile k_value must be numeric")
+            return False
+
+        import copy
+        command = copy.deepcopy(EXTRUSION_CALI_SET_TEMPLATE)
+        nozzle_diameter = self.get_model().info.active_nozzle_diameter
+        nozzle_diameter = str(nozzle_diameter) if nozzle_diameter else "0.4"
+        filament = command["print"]["filaments"][0]
+        command["print"]["nozzle_diameter"] = nozzle_diameter
+        filament.update({
+            "extruder_id": self.get_model().extruder.active_nozzle_index,
+            "filament_id": filament_id,
+            "k_value": k_value,
+            "name": data.get("name", "Home Assistant"),
+            "nozzle_diameter": nozzle_diameter,
+            "nozzle_id": data.get("nozzle_id", ""),
+            "setting_id": data.get("setting_id", ""),
+        })
+        self.client.publish(command)
+        return True
     def _service_call_select_pa_profile(self, data: dict):
         if not self.get_model().supports_feature(Features.PA_CALIBRATION_PROFILES):
             LOGGER.error("Printer does not support PA calibration profiles")

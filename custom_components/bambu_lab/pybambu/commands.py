@@ -181,6 +181,28 @@ EXTRUSION_CALI_GET_TEMPLATE = {
         "extruder_id": 0,
     }
 }
+EXTRUSION_CALI_SET_TEMPLATE = {
+    "print": {
+        "sequence_id": "1",
+        "command": "extrusion_cali_set",
+        "nozzle_diameter": "0.4",
+        "filaments": [
+            {
+                "ams_id": 0,
+                "extruder_id": 0,
+                "filament_id": "",
+                "k_value": "0.000000",
+                "n_coef": "0.000000",
+                "name": "",
+                "nozzle_diameter": "0.4",
+                "nozzle_id": "",
+                "setting_id": "",
+                "slot_id": 0,
+                "tray_id": -1,
+            }
+        ],
+    }
+}
 
 EXTRUSION_CALI_SEL_TEMPLATE = {
     "print": {
