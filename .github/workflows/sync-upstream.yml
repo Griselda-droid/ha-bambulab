@@ -1,0 +1,42 @@
+name: Sync upstream
+
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Fetch upstream changes
+        run: |
+          git remote add upstream https://github.com/greghesp/ha-bambulab.git
+          git fetch upstream main
+          git merge --no-edit upstream/main
+
+      - name: Create upstream update pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: automation/sync-upstream
+          delete-branch: true
+          title: "Sync greghesp/ha-bambulab"
+          commit-message: "Sync greghesp/ha-bambulab main"
+          body: |
+            Automated update from `greghesp/ha-bambulab`.
+
+            Review any conflicts and integration-specific changes before merging.
+          labels: upstream,sync
+          base: main
+          add-paths: |
+            .
