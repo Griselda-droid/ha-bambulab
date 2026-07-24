@@ -642,7 +642,11 @@ class BambuClient:
         if self._pending_response is None or self._pending_response_command is None:
             return
         command = print_data.get("command")
-        if command == self._pending_response_command and "result" in print_data:
+        is_pa_profile_response = (
+            command == "extrusion_cali_get"
+            and isinstance(print_data.get("filaments"), list)
+        )
+        if command == self._pending_response_command and ("result" in print_data or is_pa_profile_response):
             future = self._pending_response
             self._pending_response = None
             self._pending_response_command = None
